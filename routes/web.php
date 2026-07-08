@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\AIController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\GeoFenceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecruitmentController;
+use App\Http\Controllers\ShiftController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -80,6 +83,47 @@ Route::middleware(['auth'])->group(function () {
         Route::post('talent-pools', [RecruitmentController::class, 'storeTalentPool'])->name('talent-pools.store');
         Route::put('talent-pools/{talentPool}', [RecruitmentController::class, 'updateTalentPool'])->name('talent-pools.update');
         Route::delete('talent-pools/{talentPool}', [RecruitmentController::class, 'destroyTalentPool'])->name('talent-pools.destroy');
+    });
+
+    // Attendance Module
+    Route::prefix('attendance')->name('attendance.')->group(function () {
+        Route::get('/', [AttendanceController::class, 'index'])->name('index');
+        Route::get('check-in', [AttendanceController::class, 'checkInView'])->name('check-in');
+        Route::post('check-in', [AttendanceController::class, 'storeCheckIn'])->name('check-in.store');
+        Route::post('check-out/{employee}', [AttendanceController::class, 'storeCheckOut'])->name('check-out.store');
+        Route::get('missing-punches', [AttendanceController::class, 'missingPunchSuggestions'])->name('missing-punches');
+        Route::get('employee/{employee}/log', [AttendanceController::class, 'employeeLog'])->name('employee-log');
+        Route::get('overtime/list', [AttendanceController::class, 'overtime'])->name('overtime');
+        Route::post('overtime/{overtime}/approve', [AttendanceController::class, 'approveOvertime'])->name('overtime.approve');
+        Route::get('anomalies/list', [AttendanceController::class, 'anomalies'])->name('anomalies');
+        Route::post('anomalies/{anomaly}/resolve', [AttendanceController::class, 'resolveAnomaly'])->name('anomalies.resolve');
+        Route::get('predict/{employee}', [AttendanceController::class, 'predictAttendance'])->name('predict');
+        Route::get('{record}', [AttendanceController::class, 'show'])->name('show');
+    });
+
+    // Shift Management
+    Route::prefix('shifts')->name('shifts.')->group(function () {
+        Route::get('/', [ShiftController::class, 'index'])->name('index');
+        Route::get('create', [ShiftController::class, 'create'])->name('create');
+        Route::post('/', [ShiftController::class, 'store'])->name('store');
+        Route::get('{shift}/assign', [ShiftController::class, 'assignForm'])->name('assign');
+        Route::post('{shift}/assign', [ShiftController::class, 'assignStore'])->name('assign.store');
+        Route::delete('{shift}/assign/{assignment}', [ShiftController::class, 'assignRemove'])->name('assign.remove');
+        Route::get('{shift}/edit', [ShiftController::class, 'edit'])->name('edit');
+        Route::put('{shift}', [ShiftController::class, 'update'])->name('update');
+        Route::delete('{shift}', [ShiftController::class, 'destroy'])->name('destroy');
+        Route::get('{shift}', [ShiftController::class, 'show'])->name('show');
+    });
+
+    // Geo-Fence Management
+    Route::prefix('geo-fences')->name('geo-fences.')->group(function () {
+        Route::get('/', [GeoFenceController::class, 'index'])->name('index');
+        Route::get('create', [GeoFenceController::class, 'create'])->name('create');
+        Route::post('/', [GeoFenceController::class, 'store'])->name('store');
+        Route::get('{geoFence}/edit', [GeoFenceController::class, 'edit'])->name('edit');
+        Route::put('{geoFence}', [GeoFenceController::class, 'update'])->name('update');
+        Route::delete('{geoFence}', [GeoFenceController::class, 'destroy'])->name('destroy');
+        Route::get('{geoFence}', [GeoFenceController::class, 'show'])->name('show');
     });
 
     // AI Features
